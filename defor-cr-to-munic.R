@@ -10,7 +10,8 @@ munic <- geobr::read_municipality() %>%
 
 dataDir <- "/Users/alinesoterroni/Dropbox/ALINE_RScript/colrow"
 myCR   <- colrow::getCR("Brazil", dataDir) %>%
-  sf::st_transform(sf::st_crs(munic))
+  sf::st_transform(sf::st_crs(munic)) %>%
+  dplyr::mutate(crarea = sf::st_area(.))
 
 mdata <- read.csv("data_TEDX_MAPS.CSV", header = FALSE) %>%
   dplyr::filter(V7 == "ZD") %>%
@@ -25,7 +26,7 @@ myCR <- myCR %>%
 
 inter <- sf::st_intersection(munic, myCR) %>%
   dplyr::mutate(iarea = sf::st_area(.)) %>%
-  dplyr::mutate(defor = iarea / marea * Value)
+  dplyr::mutate(defor = iarea / crarea * Value)
 
 sum(inter$defor) # 57781.39
 
