@@ -3,8 +3,7 @@ require(dplyr)
 
 sf::sf_use_s2(FALSE)
 
-biomes <- geobr::read_biomes(year = 2004)
-#biomes <- geobr::read_biomes()
+biomes <- geobr::read_biomes()[-7,]
 munic <- geobr::read_municipality() %>%
   dplyr::mutate(marea = sf::st_area(.))
 
@@ -23,6 +22,13 @@ sum(mdata$Value) # 57667.35
 
 myCR <- myCR %>%
   dplyr::inner_join(mdata, by = "ID")
+
+max(myCR$Value)
+
+tm_shape(myCR) +
+  tm_fill(col = "Value", palette = pal, breaks = c(0,5,10,20,30,50,100,200,300)) +
+  tm_shape(biomes) +
+  tm_borders()
 
 inter <- sf::st_intersection(munic, myCR) %>%
   dplyr::mutate(iarea = sf::st_area(.)) %>%
@@ -52,7 +58,7 @@ require(tmap)
 
 png("map_ZD.png", width = 1240, height = 1240)
 tm_shape(final) +
-  tm_fill(col = "defor", palette = pal, breaks = c(0,0.31,1.15,2.34,3.76,5.72,15,30,60,120,150,230)) +
+  tm_fill(col = "defor", palette = pal, breaks = c(0,5,10,20,30,50,100,200,500,1000,2000,4000)) +
   tm_shape(biomes) +
   tm_borders()
 
